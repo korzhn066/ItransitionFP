@@ -1,0 +1,173 @@
+﻿@using FinalProject.Domain.Enums;
+
+<h1>@Localizer["Add collection"]</h1>
+
+<br/>
+
+<form class="form-horizontal" style="max-width: 600px;" method="post" asp-controller="Collection" asp-action="AddCollection">
+    <div class="form-group">
+        <input type="text" class="form-control addinput" id="collectionName" name="name" placeholder="@Localizer["Enter collection name"]">
+    </div>
+
+    <div class="form-group">
+        <input type="text" class="form-control addinput" id="collectionDescription"
+               name="description" placeholder="@Localizer["Enter collection description"]">
+    </div>
+
+    <div style="display:flex; flex-direction: row; justify-content: space-between;">
+        <input id="tagName" oninput="getTags(this.value)" class="form-control mr-sm-2 addtag" placeholder="@Localizer["Enter tag name"]">
+
+        <select id="tagType" class="addtag form-select">
+            <option value="" selected>@Localizer["Select tag type"]</option>
+            <option value="@TagType.Text.ToString()">@Localizer["Text"]</option>
+            <option value="@TagType.LongText.ToString()">@Localizer["Long text"]</option>
+            <option value="@TagType.Date.ToString()">@Localizer["Date"]</option>
+            <option value="@TagType.CheckBox.ToString()">@Localizer["Check box"]</option>
+        </select>
+
+        <button onclick="addTag()" type="button" class="addtag btn btn-light">@Localizer["Add tag"]</button>
+    </div>
+
+    <ul id="tags">
+    </ul>
+
+    <div id="tagEnterError" hidden style="width: 100%; color: red; text-align: center;">
+        @Localizer["You should write name and select type"]
+    </div>
+
+    <ul id="tagsList" style="margin-bottom: 10px;" class="list-group list-group-flush">
+        <li class="list-group-item">
+            <div style="display: flex; justify-content: space-between;">
+                <input class="readonlyInput" placeholder="@Localizer["Tag name"]" readonly />
+                <input class="readonlyInput" placeholder="@Localizer["Tag type"]" readonly />
+            </div>
+        </li>
+    </ul>
+
+    <button type="submit" class="btn btn-success">@Localizer["Add collection"]</button>
+</form>
+
+<script>
+    const collectionNameInput = document.getElementById("collectionName")
+    const collectionDescriptionInput = document.getElementById("collectionDescription")
+    
+    const tagName = document.getElementById("tagName")
+    const tagType = document.getElementById("tagType")
+    const tagsList = document.getElementById("tagsList")
+    const tagEnterError = document.getElementById("tagEnterError")
+
+    let tags = []
+
+    const addTag = () => {
+        if (tagName.value == "" || tagType.value == "") {
+            tagEnterError.hidden = false
+        }else{
+            tags.push({
+                name: tagName.value,
+                type: tagType.value
+            })
+
+            tagName.value = ""
+            tagType.value = ""
+
+            tagEnterError.hidden = true
+            renderTags()
+        }
+    }
+
+    const renderTags = () => {
+        let html = `
+                <li class="list-group-item">
+                <div style="display: flex; justify-content: space-between;">
+                    <input class="readonlyInput" placeholder="Tag name" readonly />
+                    <input class="readonlyInput" placeholder="Tag type" readonly />
+                </div>
+            </li>
+        `
+
+        tags.forEach((tag, index) => {
+            html +=
+                `
+                    <li class="list-group-item">
+                        <div style="display: flex; justify-content: space-between;" >
+                                <input name="tags[${index}].Name" value="${tag.name}" class="readonlyInput" placeholder = "${tag.name}" readonly/>
+                                <input name="tags[${index}].Type" value="${tag.type}" class="readonlyInput" placeholder = "${tag.type}" readonly/>
+                        </div>
+                    </li>
+                `
+        })
+
+        tagsList.innerHTML = html
+    }
+
+    const tagsUl = document.getElementById("tags")
+
+    const getTags = (text) => {
+        const url = "/Search/SearchTags/?text=" + text
+
+        if (text == "") {
+            renderUltags([])
+            return
+        }
+
+        $.ajax({
+            url: url,
+            method: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                console.log(data)
+                renderUltags(data.tags)
+            },
+            error: (e) => {
+                console.log(e)
+            }
+        });
+    }
+
+    const renderUltags = (tags) => {
+        let html = ""
+
+        tags.forEach((tag) => {
+            html +=
+                `
+                    <li>
+                        <button type="button" onclick="addTagSearch(this.innerHTML, ${tag.type})" style="border:none;" 
+                        class="dropdown-item">${tag.name}</button>
+                    </li>
+                `
+        })
+
+        tagsUl.innerHTML = html
+    }
+
+    const addTagSearch = (name, type) => {
+        let value = ""
+        
+        switch (type) {
+            case 0:
+                value = "Text"
+                break
+            case 1:
+                value = "LongText"
+                break
+            case 2:
+                value = "CheckBox"
+                break
+            case 3:
+                value = "Date"
+                break
+            
+        }
+        
+        tags.push({
+            name: name,
+            type: value
+        })
+
+        tagName.value = ""
+        tagType.value = ""
+
+        tagEnterError.hidden = true
+        renderTags()
+    }
+</script>

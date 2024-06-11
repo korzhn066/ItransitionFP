@@ -1,0 +1,96 @@
+﻿@model FinalProject.ViewModels.Item.UpdateItemViewModel
+@using FinalProject.Domain.Enums;
+
+@{
+    string CheckData(string date)
+    {
+        if (date[6] == '-')
+        {
+            date = date.Insert(5, "0");
+        }
+
+        if (date.Length == 9)
+        {
+            date = date.Insert(8, "0");
+        }
+
+        return date;
+    }
+}
+
+<h1>@Localizer["Update item"]</h1>
+
+<form method="post" asp-controller="Item" asp-action="UpdateItem">
+    <div class="form-group">
+        <input value="@Model.Item.Id" name="item.id" hidden />
+        <input type="text" class="form-control" value="@Model.Item.Name" name="item.name">
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">@Localizer["Tag name"]</th>
+                <th scope="col">@Localizer["Value"]</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var itemTag in Model.Item.TagItems.Select((value, index) => (value, index)))
+            {
+                <tr>
+                    <th scope="col">
+                        <input value="@itemTag.value.ItemId" name="item.tagItems[@itemTag.index].itemId" hidden />
+                        <input value="@itemTag.value.TagId" name="item.tagItems[@itemTag.index].tagId" hidden />
+                        @itemTag.value.Tag.Name:
+                    </th>
+
+                    @if (itemTag.value.Tag.Type == TagType.CheckBox)
+                    {
+                        if (itemTag.value.Body == "on")
+                        {
+                            <th scope="col">
+                                <input name="item.tagItems[@itemTag.index].body" type="checkbox" checked />
+                            </th>
+                        }
+                        else
+                        {
+                            <th scope="col">
+                                <input name="item.tagItems[@itemTag.index].body" type="checkbox" />
+                            </th>
+                        }
+                    
+                    }
+                    else if (itemTag.value.Tag.Type == TagType.Date)
+                    {
+                        <th scope="col">
+                            <input class="form-control" style="width:auto;" type="date" value="@CheckData(@itemTag.value.Body.Trim(' ', '\"'))"
+                            name="item.tagItems[@itemTag.index].body" />
+                        </th>
+                    }
+                    else if (itemTag.value.Tag.Type == TagType.LongText)
+                    {
+                        <th scope="col">
+                            <textarea class="form-control" name="item.tagItems[@itemTag.index].body" rows="3">@itemTag.value.Body</textarea>
+                        </th>
+                    }
+                    else
+                    {
+                        <th scope="col">
+                            <input name="item.tagItems[@itemTag.index].body" type="text" class="form-control" value="@itemTag.value.Body">
+                        </th>
+                    }
+                </tr>
+            }
+        
+        </tbody>
+    </table>
+
+    @if (!Model.IsValid)
+    {
+        <div style="width:100%; color: red;">
+            @Localizer["All fields must be filled in"]
+        </div>
+    }
+
+    <button type="submit" class="btn btn-success">@Localizer["Update item"]</button>
+</form>

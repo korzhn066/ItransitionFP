@@ -1,0 +1,76 @@
+﻿@using FinalProject.Domain.Enums;
+@using FinalProject.ViewModels.Item;
+@model FinalProject.ViewModels.Item.AddItemViewModel;
+
+<h1>@Localizer["Add item"]</h1>
+
+<form method="post" asp-controller="Item" asp-action="AddItem">
+    <div class="form-group">
+        <input type="text" class="form-control" name="name" placeholder="@Localizer["Name"]">
+    </div>
+
+    <input name="collectionId" value="@Model.CollectionId" hidden/>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">@Localizer["Tag name"]</th>
+                <th scope="col">@Localizer["Enter value"]</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var tag in Model.Tags.Select((value, index) => (value, index)))
+            {
+                <tr>
+                    <th scope="col">@tag.value.Name</th>
+                    
+                    <th scope="col">
+                        <input hidden name="tags[@tag.index].Name" value="@tag.value.Name" />
+                        <input hidden name="tags[@tag.index].Type" value="@tag.value.Type" />
+                        <input hidden name="tags[@tag.index].Id" value="@tag.value.Id" />
+
+                        @if (tag.value.Type == TagType.Text)
+                        {
+                            <div class="form-group">
+                                <input name="tagsBodyWithId[@tag.index].TagId" value="@tag.value.Id" hidden>
+                                <input type="text" class="form-control" name="tagsBodyWithId[@tag.index].Body" placeholder="@tag.value.Name">
+                            </div>
+                        }
+                        else if (tag.value.Type == TagType.LongText)
+                        {
+                            <div class="form-group">
+                                <input name="tagsBodyWithId[@tag.index].TagId" value="@tag.value.Id" hidden>
+                                <textarea class="form-control" name="tagsBodyWithId[@tag.index].Body" placeholder="@tag.value.Name" rows="3"></textarea>
+                            </div>
+                        }
+                        else if (tag.value.Type == TagType.Date)
+                        {
+                            <div class="form-group">
+                                <input name="tagsBodyWithId[@tag.index].TagId" value="@tag.value.Id" hidden>
+                                <input class="form-control" style="width:auto;" type="date" name="tagsBodyWithId[@tag.index].Body" />
+                            </div>
+                        }
+                        else if (tag.value.Type == TagType.CheckBox)
+                        {
+                            <div class="form-group">
+                                <input name="tagsBodyWithId[@tag.index].TagId" value="@tag.value.Id" hidden>
+                                <input style="width:20px;height:20px;" name="tagsBodyWithId[@tag.index].Body" type="checkbox">
+                            </div>
+                        }
+                    </th>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (Model.IsError)
+    {
+        <div style="width:100%; color: red;">
+            @Localizer["All fields must be filled in"]
+        </div>
+    }
+    
+
+    <button type="submit" class="btn btn-success">@Localizer["Add item"]</button>
+</form>

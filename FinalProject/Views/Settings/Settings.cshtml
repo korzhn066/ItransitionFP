@@ -1,0 +1,13 @@
+﻿@using Microsoft.AspNetCore.Localization;
+
+@{
+    var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+    var cultureList = ViewData["Cultures"] as List<SelectListItem>;
+}
+
+<form id="selectLanguage" asp-controller="Settings"
+      asp-action="SetLanguage" asp-route-returnUrl="@Context.Request.Path"
+      method="post" role="form" style="width: 100%">
+    <select class="form-control" name="culture"
+            asp-for="@requestCulture.RequestCulture.UICulture.Name" asp-items="cultureList" onchange="this.form.submit()"></select>
+</form>

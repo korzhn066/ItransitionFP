@@ -1,0 +1,67 @@
+﻿@model FinalProject.ViewModels.Collection.CollectionViewModel
+
+<h4>@Localizer["Collection"]: @Model.Collection.Name</h4>
+<h6>@Localizer["Description"]: @Model.Collection.Description</h6>
+
+@if (Model.Owner == Context.User.Identity!.Name || Context.User.IsInRole("Admin"))
+{
+    <a asp-controller="Collection" asp-action="UpdateCollection" asp-route-id="@Model.Collection.Id" class="btn btn-dark">
+        @Localizer["UpdateCollection"]
+    </a>
+
+    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">
+        @Localizer["DeleteCollection"]
+    </button>
+
+    <a asp-controller="Item" asp-action="AddItem" asp-route-collectionId="@Model.Collection.Id" class="btn btn-success">
+        @Localizer["AddItem"]
+    </a>
+}
+
+<a class="btn btn-primary" asp-controller="Account" asp-action="UserCollections" asp-route-username="@Model.Owner">Go to author</a>
+
+<br />
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">@Localizer["Name"]</th>
+            <th scope="col">@Localizer["GoToItem"]</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in Model.Items)
+        {
+            <tr>
+                <th scope="col">@item.Name</th>
+                <th scope="col">
+                    <a asp-controller="Item" asp-action="Item" asp-route-id="@item.Id"> @Localizer["GoTo"] @item.Name</a>
+                </th>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">
+            @Localizer["SureDelete"]
+        </h5>
+        
+         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["Close"]</button>
+
+        <form method="post" asp-controller="Collection" asp-action="DeleteCollection" asp-route-id="@Model.Collection.Id">
+            <button type="submit" class="btn btn-danger">@Localizer["Delete"]</button>
+        </form>
+        
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,21 @@
+﻿@model FinalProject.ViewModels.Collection.UpdateCollectionViewModel
+
+<h1>@Localizer["Update collection"]</h1>
+
+<br />
+
+<form class="form-horizontal" style="max-width: 600px;" method="post" asp-controller="Collection" asp-action="UpdateCollection">
+    <div class="form-group">
+        <input type="text" class="form-control addinput" id="collectionName" 
+            value="@Model.Name" name="name" placeholder="@Localizer["Enter collection name"]">
+    </div>
+
+    <div class="form-group">
+        <input type="text" class="form-control addinput" id="collectionDescription" 
+            value="@Model.Description" name="description" placeholder="@Localizer["Enter collection description"]">
+    </div>
+
+    <input name="id" value="@Model.Id" hidden/>
+
+    <button type="submit" class="btn btn-success">@Localizer["Update collection"]</button>
+</form>

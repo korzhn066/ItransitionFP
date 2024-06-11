@@ -1,0 +1,69 @@
+﻿@model FinalProject.ViewModels.Account.UserCollectionsViewModel
+
+<h1>@Model.Owner collections</h1>
+
+@if (Model.Owner == Context.User.Identity!.Name || Context.User.IsInRole("Admin"))
+{
+    <a asp-controller="Collection" asp-action="AddCollection" class="btn btn-success">@Localizer["Add collection"]</a>
+}
+
+<br/>
+
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">@Localizer["Name"]</th>
+      <th scope="col">@Localizer["Description"]</th>
+      <th scope="col">@Localizer["Go to collection"]</th>
+    </tr>
+  </thead>
+
+  <tbody>
+        @foreach (var collection in Model.Collections)
+        {
+            <tr>
+                <th scope="col">@collection.Name</th>
+                <th scope="col">@collection.Description</th>
+                <th scope="col">
+                        <a asp-controller="Collection" asp-action="Collection" asp-route-id="@collection.Id"> @Localizer["Go to"] @collection.Name</a>
+                </th>
+            </tr>
+        }
+  </tbody>
+</table>
+
+@if (Model.MaxCount == Model.Collections.Count && Model.CurrentPage == 0)
+{
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+            @if(Model.CurrentPage != 0)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-controller="Account" asp-action="UserCollections" asp-route-username="@Model.Owner" asp-route-page="@Model.CurrentPage + 1">
+                        Previous
+                    </a>
+                </li>
+            }
+            
+            <li class="page-item">
+                <a class="page-link" asp-controller="Account" asp-action="UserCollections" asp-route-username="@Model.Owner" asp-route-page="@Model.CurrentPage + 1">
+                    Next
+                </a>
+            </li>
+        </ul>
+    </nav>
+}
+
+<h1>@Model.Owner problems</h1>
+
+<ul>
+    @foreach(var issue in Model.Issues.Issues)
+    {
+        <li>
+            <a href="https://korzhn066.atlassian.net/jira/software/projects/SCRUM/list?selectedIssue=@issue.Key">
+                @issue.Fields.Summary
+            </a>
+        </li>
+    }
+</ul>

@@ -1,0 +1,140 @@
+﻿@using FinalProject.Domain.Enums;
+@using FinalProject.ViewModels.Item;
+@model FinalProject.ViewModels.Item.ItemViewModel;
+
+<h4>@Model.Item.Name</h4>
+
+@if(ViewBag.IsOwner || Context.User.IsInRole("Admin"))
+{
+    <a asp-controller="Item" asp-action="UpdateItem" asp-route-id="@Model.Item.Id" class="btn btn-dark">Update</a>
+
+    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">
+        @Localizer["Delete"]
+    </button>
+}
+
+<a class="btn btn-primary" asp-controller="Account" asp-action="UserCollections" asp-route-username="@Model.Owner">@Localizer["Go to author"]</a>
+<a class="btn btn-primary" asp-controller="Collection" asp-action="Collection" asp-route-id="@Model.Item.CollectionId">@Localizer["Back to collection"]</a>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">@Localizer["Tag name"]</th>
+            <th scope="col">@Localizer["Value"]</th>
+        </tr>
+    </thead>
+
+      <tbody>
+            @foreach (var itemTag in Model.Item.TagItems)
+            {
+                <tr>
+                    <th scope="col">@itemTag.Tag.Name:</th>
+
+                    @if (itemTag.Tag.Type == TagType.CheckBox)
+                    {
+                        if (itemTag.Body == "on")
+                        {
+                            <th scope="col">
+                                <i class="bi bi-check"></i>
+                            </th>                                              
+                        }
+                        else
+                        {
+                            <th scope="col">
+                                <i class="bi bi-x"></i>
+                            </th>
+                        }
+                    }
+                    else if (itemTag.Tag.Type == TagType.Date)
+                    {
+                        <th scope="col">@itemTag.Body</th>
+                    }
+                    else
+                    {
+                        <th scope="col">@itemTag.Body</th>
+                    }
+                </tr>
+            }
+      </tbody>
+</table>
+
+<div style="display: flex; width: 100%;">
+    <input  id="commentInput" class="form-control" style="height: 40px;" placeholder="@Localizer["Enter comment"]" />
+    
+    <button onclick="sendComment()" type="button" style="margin-left: 10px; height: 40px;" class="btn btn-primary mb-2">
+        @Localizer["Send"]
+    </button>
+</div>
+
+<div id="comments" style="width: 100%;">
+    @foreach(var comment in Model.Comments)
+    {
+        <div style="width: 100%; padding: 10px; border-bottom: 1px solid #ccc;"> 
+            @comment.Message
+        </div>
+    }
+</div>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">
+                    SureDelete
+                </h5>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["Close"]</button>
+
+                <form method="post" asp-controller="Item" asp-action="DeleteItem" asp-route-collectionId="@Model.Item.CollectionId" asp-route-id="@Model.Item.Id">
+                    <button type="submit" class="btn btn-danger">@Localizer["Delete"]</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="~/microsoft/signalr/dist/browser/signalr.min.js"></script>
+<script>
+    const hubConnection = new signalR.HubConnectionBuilder()
+        .withUrl("/comment")
+        .withAutomaticReconnect()
+        .build();
+
+    const itemId = @Model.Item.Id
+
+    const comments = document.getElementById("comments")
+
+    hubConnection.on(itemId.toString(), (data) => {
+        let oldHtml = comments.innerHTML
+        
+        let html = `
+                <div style="width: 100%; padding: 10px; border-bottom: 1px solid #ccc;">
+                    ${data}
+                </div>
+        `
+
+        comments.innerHTML = html + oldHtml
+    });
+
+    hubConnection.start()
+
+    const commentInput = document.getElementById("commentInput")
+
+    commentInput.addEventListener("keyup", function (event) {
+        if (event.key === "Enter") {
+            alert("a")
+            sendComment()
+        }
+    });
+
+    const sendComment = async () => {
+        await hubConnection.invoke("SendComment", @Model.Item.Id, commentInput.value)
+        commentInput.value = ""
+    }
+</script>

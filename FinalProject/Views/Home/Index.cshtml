@@ -1,0 +1,67 @@
+﻿@using Microsoft.AspNetCore.Localization;
+@model FinalProject.ViewModels.IndexViewModel
+
+<h1>@Localizer["FiveLargestCollections"]</h1>
+
+<br/>
+
+<table class="table">
+  <thead>
+    <tr>
+        <th scope="col">@Localizer["Name"]</th>
+        <th scope="col">@Localizer["Description"]</th>
+        <th scope="col">@Localizer["GoToCollection"]</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    @foreach (var collection in Model.Collections)
+        {
+            <tr>
+                <th scope="col">@collection.Name</th>
+                <th scope="col">@collection.Description</th>
+                <th scope="col">
+                    <a asp-controller="Collection" asp-action="Collection" asp-route-id="@collection.Id"> @Localizer["GoTo"] @collection.Name</a>
+                </th>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h1>@Localizer["Five last items"]</h1>
+
+<br/>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">@Localizer["Name"]</th>
+            <th scope="col">Go to item</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in Model.Items)
+        {
+            <tr>
+                <th scope="col">@item.Name</th>
+
+                <th scope="col">
+                    <a asp-controller="Item" asp-action="Item" asp-route-id="@item.Id"> @Localizer["GoTo"] @item.Name</a>
+                </th>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h1>@Localizer["Tags"]</h1>
+
+<div>
+    @foreach (var tag in Model.Tags)
+    {
+        <a asp-controller="Item" asp-action="ItemList" asp-route-tagId="@tag.Id"
+            style="font-size: 15px; padding: 2px;">@tag.Name</a>
+    }
+</div>
+
+<br/>

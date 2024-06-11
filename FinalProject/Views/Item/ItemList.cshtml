@@ -1,0 +1,24 @@
+﻿@model FinalProject.ViewModels.Item.ItemListViewModel;
+
+<h1>Items</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">@Localizer["Name"]</th>
+            <th scope="col">@Localizer["GoToItem"]</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in Model.Items)
+        {
+            <tr>
+                <th scope="col">@item.Name</th>
+                <th scope="col">
+                    <a asp-controller="Item" asp-action="Item" asp-route-id="@item.Id"> @Localizer["GoTo"] @item.Name</a>
+                </th>
+            </tr>
+        }
+    </tbody>
+</table>

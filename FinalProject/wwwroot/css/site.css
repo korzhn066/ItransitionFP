@@ -1,0 +1,48 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.addinput{
+    margin-bottom: 10px;
+}
+
+.addtag {
+    width: 30%;
+    height: 40px;
+    margin-bottom: 10px;
+}
+
+.readonlyInput{
+    border: none;
+    width: 100px;
+    outline: none;
+}
+
+.readonlyInput::placeholder{
+    color: black;
+}
+
+#items {
+    width: 100%;
+    border-radius: 0px;
+    text-align: center;
+}
+
+#item > li{
+    color: red;
+}

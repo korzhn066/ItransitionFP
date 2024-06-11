@@ -1,0 +1,61 @@
+﻿@model FinalProject.ViewModels.AdminPanel.AdminPanelViewModel
+
+<script type="text/javascript">
+    function check(field, checkbox) {
+        if (checkbox.checked) {
+            for (i = 0; i < field.length; i++)
+                field[i].checked = true;
+        } else {
+            for (i = 0; i < field.length; i++)
+                field[i].checked = false;
+        }
+    }
+</script>
+
+<style>
+    .btnmargin {
+        margin-right: 10px;
+    }
+</style>
+
+
+<h1>@Localizer["Admin panel"] </h1>
+
+<table class="table">
+    <form method="post" asp-controller="AdminPanel">
+        <button class="btn btn-success btnmargin" type="submit" value="Unblock" asp-action="Unblock">
+            <i class="bi bi-door-open"></i>
+            @Localizer["Unblock"]
+        </button>
+
+        <button class="btn btn-danger btnmargin" type="submit" value="Block" asp-action="Block">
+            <i class="bi bi-ban"></i>
+            @Localizer["Block"]
+        </button>
+
+        <thead>
+            <tr>
+                <th scope="col">
+                    <input class="form-check-input" type="checkbox" value="" id="" onchange="check(this.form.usersId, this)">
+                </th>
+                <th scope="col">@Localizer["Name"]</th>
+                <th scope="col">@Localizer["Status"]</th>
+                <th scope="col">@Localizer["Is admin"]</th>
+            </tr>
+        </thead>
+        <tbody>
+
+                @foreach (var user in Model.ApplicationUserWithAdminRoles)
+                {
+                    <tr>
+                        <th scope="row">
+                            <input class="form-check-input" type="checkbox" name="usersId" value="@user.ApplicationUser.Id">
+                        </th>
+                        <td>@user.ApplicationUser.UserName</td>
+                        <td>@user.ApplicationUser.Status.ToString()</td>
+                        <td>@user.IsAdmin</td>
+                    </tr>
+                }
+        </tbody>
+    </form>
+</table>
